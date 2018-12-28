@@ -1,4 +1,4 @@
-# SPACELYFT DEVLOG :rocket:
+# :rocket: ~~ SPACELYFT DEVLOG ~~ :rocket:
 
 
 ### December 27th, 2018
@@ -8,5 +8,5 @@
 - [x] added gems to gemfile (tty-prompt, colorize)
 
 ### December 21st, 2018
-- [x] project proposal with jane (SpaceLyft)
+- [x] project proposal with #janeywaney (SpaceLyft)
 - [x] whiteboarded the models and relations between them
