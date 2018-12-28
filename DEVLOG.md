@@ -1,4 +1,4 @@
-# :rocket: ~~ **SPACELYFT DEVLOG** ~~ :rocket:
+# :rocket: SPACELYFT DEVLOG :rocket:
 
 
 ### December 27th, 2018
