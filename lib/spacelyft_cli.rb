@@ -1,12 +1,103 @@
 class SpacelyftCLI
   attr_accessor :username
+
   def spacelyft_app
 
+    system("clear")
 
+############### START SCREEN MUSIC ##################
     pid = fork{ exec 'afplay', "underthestars.mp3" }
 
+############### ROCKETS ASCII ART ##################
+    def rockets_ascii
+      puts "    *                                      *       "
+      puts "                         *                        "
+      puts "                                                 "
+      puts "             *                                    "
+      puts "                                         *        "
+      puts "               __"
+      puts "     *         \\ \\_____        *"
+      puts "            ###[==_____>"
+      puts "               /_/      __                    *"
+      puts "                        \\ \\_____"
+      puts "          *          ###[==_____>"
+      puts "                        /_/"
+      puts "                                     *    "
+      puts "                                                "
+      puts "   *"
+      puts "              *                               *"
+      puts "                           *"
+      puts ""
+    end
 
+    rockets_ascii
+    puts "======================================================"
+    puts " ....:::: Welcome to the SpaceLyft CLI App! ::::...."
+    puts "======================================================"
+
+    prompt = TTY::Prompt.new
+    selection = prompt.select("", ["New Account", "Existing Accounts", "About SpaceLyft", "Exit"])
+
+    case selection
+      when "New Account"
+        new_account
+      when "Existing Accounts"
+        existing_accounts
+      when "About SpaceLyft"
+        about_spacelyft
+      when "Exit"
+        close_app
+    end
+
+  end
+
+  def new_account
+
+    prompt = TTY::Prompt.new
+    company_name = prompt.ask("What Company are you from?", required: true, modify: :capitalize)
+    self.username = User.create( username: company_name )
+
+    pid = fork{ exec "killall", 'afplay' }
+
+    sleep(1.seconds)
+    puts "Please hold while we locate your account!"
+    sleep(4.seconds)
+    pid = fork{ exec 'afplay', "comefindme.mp3" }
     system("clear")
+    main_menu
+  end
+
+  def existing_accounts
+    prompt = TTY::Prompt.new
+    choice = prompt.select("Choose a File", User.pluck("username"))
+    # binding.pry
+    self.username = User.find_by(username: choice)
+    puts "Welcome back, #{self.username.username}!"
+    puts ""
+    puts "-------------------------------"
+    puts ""
+    sleep(3.seconds)
+    pid = fork{ exec "killall", 'afplay' }
+    sleep(1.seconds)
+    pid = fork{ exec 'afplay', "comefindme.mp3" }
+    main_menu
+  end
+
+  def about_spacelyft
+  end
+
+  def close_app
+    system("clear")
+    rockets_ascii
+    puts "======================================================"
+    puts "  ..:: Thanks for using the SPACELYFT CLI APP! ::.."
+    puts "======================================================"
+    sleep(5.seconds)
+    system("clear")
+  end
+
+
+  def main_menu
 
 
     puts "    *                                      *       "
@@ -26,80 +117,41 @@ class SpacelyftCLI
     puts "   *"
     puts "              *                               *"
     puts "                           *"
+    puts ""
+    puts "======================================================"
+    puts "      ....:::: SPACELYFT - MAIN MENU ::::...."
+    puts "======================================================"
+    puts ""
+    puts "CURRENT ACCOUNT: #{username.username}"
+    puts "ACCOUNT ID: #{username}"
 
-    puts ""
-    puts "======================================================"
-    puts " ....:::: Welcome to the SpaceLyft CLI App! ::::...."
-    puts "======================================================"
-    puts ""
+    random_weather_array = [
+      "GEOSOLAR STORMS IMMINENT",
+      "MAGNETIC ANNOMALYS IN THE AREA",
+      "A HORDE OF SPACE PIRATES HAVE BEEN SPOTTED!"
+    ]
+    puts "------------------------------------------------------"
+    puts "WEATHER REPORT: #{random_weather_array.sample}"
+    puts "------------------------------------------------------"
+
     prompt = TTY::Prompt.new
-    selection = prompt.select("..::MAIN MENU::..", ["New Account", "Existing Account", "About SpaceLyft", "Exit"])
+    selection = prompt.select("", ["GNN - GALACTIC NEWS NETWORK", "New Mission", "Past Mission Logs", "Inventory", "Go Back"])
 
     case selection
-      when "New Account"
-        new_account
-      when "Existing Account"
-        existing_accounts
-      when "About SpaceLyft"
-        about_spacelyft
-      when "Exit"
-        close_app
-    end
-
-  end
-
-
-
-  def new_account
-
-    prompt = TTY::Prompt.new
-    company_name = prompt.ask("What Company are you from?", required: true)
-    self.username = User.new( username: company_name )
+      when "GNN - GALACTIC NEWS NETWORK"
+        galactic_news
+      when "New Mission"
+        new_mission
+      when "Past Mission Logs"
+        past_missions
+      when "Inventory"
+        inventory
+      when "Go Back"
+        # close_app
         pid = fork{ exec "killall", 'afplay' }
-
-############### PROGRESS BAR ##################
-        # progress = 'Progress ['
-        # iteration_count = 1000
-        # iteration_count.times do |i|
-        #
-        #   # i is number from 0-999
-        #   j = i + 1
-        #   # how many times the total number is divisible by 100 (I couldn't come up with a great name off the top of my head)
-        #   denominator = iteration_count / 100
-        #
-        #     # add 1 percent every 10 times
-        #     if j % denominator == 0
-        #       progress << ""
-        #       # move the cursor to the beginning of the line with \r
-        #       print "\r"
-        #       # puts add \n to the end of string, use print instead
-        #       print progress + " #{j / denominator} %]"
-        #
-        #       # force the output to appear immediately when using print
-        #       # by default when \n is printed to the standard output, the buffer is flushed.
-        #       $stdout.flush
-        #       sleep 0.05
-        #     end
-        #   end
-        #   puts "\nDone!"
-################################################
-
-
-    puts "Welcome #{self.username.username}!"
-    sleep(1.seconds)
-        pid = fork{ exec 'afplay', "comefindme.mp3" }
-
+        spacelyft_app
+    end
   end
-
-  def existing_accounts
-  end
-
-  def about_spacelyft
-  end
-
-  def close_app
-  end
-
 
 
 

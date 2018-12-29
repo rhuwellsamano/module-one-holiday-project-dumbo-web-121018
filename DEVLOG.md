@@ -1,6 +1,9 @@
 # :rocket: ..:: SPACELYFT DEVLOG ::.. :rocket:
 
 
+### December 28th, 2018
+- [x] created loading_screen, added music, started EXISTING_ACCOUNTS method, attempted to shut up SQL Logger 
+
 ### December 27th, 2018
 - [x] created models (users.rb, item.rb, destination.rb, rocketship.rb, pilot.rb, mission.rb)
 - [x] created database (..mission_tables.rb)
