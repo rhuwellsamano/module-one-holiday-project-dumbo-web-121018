@@ -10,15 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181228082336) do
+ActiveRecord::Schema.define(version: 20181230004042) do
 
   create_table "destinations", force: :cascade do |t|
     t.string "destination_name"
   end
 
   create_table "items", force: :cascade do |t|
-    t.string  "item_name"
-    t.integer "quantity"
+    t.string "item_name"
   end
 
   create_table "missions", force: :cascade do |t|
@@ -28,10 +27,9 @@ ActiveRecord::Schema.define(version: 20181228082336) do
     t.integer "destination_id"
     t.integer "rocketship_id"
     t.integer "pilot_id"
-    t.integer "mission_id"
   end
 
-  create_table "pilot", force: :cascade do |t|
+  create_table "pilots", force: :cascade do |t|
     t.string "pilot_name"
   end
 
