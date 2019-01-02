@@ -196,7 +196,7 @@ class SpacelyftCLI
   end
 
   def new_mission
-    play_song("goliath.mp3")
+    # play_song("goliath.mp3")
 
     system("clear")
 
@@ -289,7 +289,7 @@ pilot_instance = Pilot.all.find_by( pilot_name: selected_choices[:pilot] )
         new_mission.enemy_id = Enemy.all.sample.id  # nil # CAN I NIL THIS?
         new_mission.save
         # binding.pry # BINDING TEST - check NEW_MISSION VARIABLE and MISSION.ALL
-        @@new_mission << new_mission
+        @@new_mission = new_mission #<< new_mission
         battle_sequence
       when "No"
         new_mission
@@ -380,7 +380,29 @@ pilot_instance = Pilot.all.find_by( pilot_name: selected_choices[:pilot] )
 
       system("clear")
 
-      rockets_ascii # PUT ENEMY ASCII HERE
+      def enemy1
+puts "        \.   \.      __,-''-.__      ./   ./   "
+puts "         \.   \`.  \`.-'"" _,=''=._ ""`-.'/  .'/   ./   "
+puts "          \`.  \_`-''      _,=''=._      ``-'_/  .'/   "
+puts "           \ `-',-._   _.  _,=''=._  ,_   _.-,`-' /   "
+puts "            \. /`,-',-._'''  \ _,=''=._ /  '''_.-,`-,'\ ./   "
+puts "             \`-'  /    `-._  "       "  _.-'    \  `-'/   "
+puts "             /)   (         \    ,-.    /         )   (\   "
+puts "         ,-''     `-.       \  /   \  /       .-'     ''`-,   "
+puts "       ,'_._         `-.____/ /  _  \ \____.-'         _._`,   "
+puts "      /,'   `.                \_/ \_/                .'   `,\   "
+puts "     /'       )                  _                  (       `\   "
+puts "             /   _,-''`-.  ,++|T|||T|++.  .-''`-,_   \   "
+puts "            / ,-'        \/|`|`|`|'|'|'|\/        `-, \   "
+puts "           /,'             | | | | | | |             `,\   "
+puts "          /'               ` | | | | | '               `\   "
+puts "                             ` | | | '   "
+puts "                               ` | '   "
+puts ""
+    end
+
+      enemy1 # PUT ENEMY ASCII HERE
+      # rockets_ascii
       puts "======================================================"
       puts "      ....:::: YOU'VE BEEN ATTACKED! ::::...."
       puts "======================================================"
@@ -408,14 +430,17 @@ pilot_instance = Pilot.all.find_by( pilot_name: selected_choices[:pilot] )
           # @@new_mission.last.rocketship.attack(@@new_mission.last.enemy)
           sleep(1.seconds)
           puts "YOU FIRED YOUR MARK IV LASER TURRETS AT THE ENEMY!"
+          puts ""
           sleep(4.seconds)
           puts "ENEMY IS WEAKENING! LET 'EM HAVE IT!"
+          puts ""
           sleep(4.seconds)
           puts "YOU DESTROYED THE ENEMY!"
+          puts ""
           sleep(2.seconds)
           puts "MISSION COMPLETE!"
           sleep(5.seconds)
-          stop_songs
+          # stop_songs
           sleep(1.seconds)
           main_menu
         when "USE MISSILES"
@@ -429,7 +454,7 @@ pilot_instance = Pilot.all.find_by( pilot_name: selected_choices[:pilot] )
           sleep(2.seconds)
           puts "MISSION COMPLETE!"
           sleep(5.seconds)
-          stop_songs
+          # stop_songs
           sleep(1.seconds)
           main_menu
         end
@@ -454,6 +479,9 @@ pilot_instance = Pilot.all.find_by( pilot_name: selected_choices[:pilot] )
 
     def spacelyft_database
       puts "HERE'S THE DB"
+      binding.pry
+      puts table(User.missions.mission_names)
+      binding.pry
       sleep(5.seconds)
       main_menu
     end
