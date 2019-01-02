@@ -1,7 +1,10 @@
-require 'colorize'
+# require 'colorize'
+require 'terminal-table/import'
 
 class SpacelyftCLI
-  attr_accessor :username
+  attr_accessor :user, :rocketship_instance
+
+  @@new_mission = []
 
   def spacelyft_app
 
@@ -68,14 +71,14 @@ class SpacelyftCLI
       q.required true
       q.modify :up
     end
-    self.username = User.create( username: company_name )
+    self.user = User.create( user_name: company_name )
 
     stop_songs
     # pid = fork{ exec "killall", 'afplay' }
 
     sleep(1.seconds)
     puts "Please hold while we locate your account!"
-    sleep(4.seconds)
+    sleep(2.seconds)
     play_song("comefindme.mp3")
     # pid = fork{ exec 'afplay', "comefindme.mp3" }
     system("clear")
@@ -84,26 +87,23 @@ class SpacelyftCLI
 
   def existing_accounts
     prompt = TTY::Prompt.new
-    choice = prompt.select("Choose a File", User.pluck("username"), per_page: 7)
+    choice = prompt.select("Choose a File", User.pluck("user_name"), per_page: 7)
     # binding.pry
-    self.username = User.find_by(username: choice)
-    sleep(1.seconds)
-    puts "Welcome back, #{self.username.username}!"
-    sleep(3.seconds)
+    self.user = User.find_by(user_name: choice)
+    sleep(0.seconds)
+    puts "Welcome back, #{self.user.user_name}!"
+    sleep(0.seconds)
     puts "Hold on while we pull up your account!"
     puts "..."
-    sleep(1.seconds)
+    sleep(0.seconds)
     puts "....."
-    sleep(1.seconds)
+    sleep(0.seconds)
     puts "......."
-    sleep(1.seconds)
+    sleep(0.seconds)
     puts "DONE!"
-    sleep(1.seconds)
     stop_songs
-    # pid = fork{ exec "killall", 'afplay' }
     sleep(1.seconds)
     play_song("comefindme.mp3")
-    # pid = fork{ exec 'afplay', "comefindme.mp3" }
     main_menu
   end
 
@@ -144,6 +144,10 @@ class SpacelyftCLI
 
   def main_menu
 
+    stop_songs
+    sleep(1.seconds)
+    play_song("comefindme.mp3")
+
     system("clear")
 
     rockets_ascii
@@ -151,8 +155,8 @@ class SpacelyftCLI
     puts "      ....:::: SPACELYFT - MAIN MENU ::::...."
     puts "======================================================"
     puts ""
-    puts "CURRENT ACCOUNT: #{username.username}"
-    puts "ACCOUNT ID: #{username.id} // TERMINAL ID: #{username}"
+    puts "CURRENT ACCOUNT: #{user.user_name}"
+    puts "ACCOUNT ID: #{user.id} // TERMINAL ID: #{user}"
 
     random_weather_array = [
       "GEOSOLAR STORMS IN THE VICINITY!",
@@ -162,12 +166,12 @@ class SpacelyftCLI
       "ALIEN LIFEFORMS ARE TAKING OVER A NEARBY PLANET!"
     ]
     puts "------------------------------------------------------"
-    puts "GNN NEWSFLASH: #{random_weather_array.sample}".colorize(:color => :white, :background => :orange)
+    puts "GNN NEWSFLASH: #{random_weather_array.sample}".colorize(:color => :white)
     puts "SPACELYFT NET WORTH: $#{rand(50000000..1000000000)}"
     puts "------------------------------------------------------"
 
     prompt = TTY::Prompt.new
-    selection = prompt.select("", ["GNN - GALACTIC NEWS NETWORK", "New Mission", "Past Mission Logs", "Shipped Items", "Go Back"])
+    selection = prompt.select("", ["GNN - GALACTIC NEWS NETWORK", "New Mission", "Past Mission Logs", "SPACELYFT.DB", "Go Back", "BINDING.PRY"])
 
     case selection
       when "GNN - GALACTIC NEWS NETWORK"
@@ -176,11 +180,14 @@ class SpacelyftCLI
         new_mission
       when "Past Mission Logs"
         past_missions
-      when "Shipped Items"
-        shipped_items
+      when "SPACELYFT.DB"
+        spacelyft_database
       when "Go Back"
         stop_songs
         spacelyft_app
+      when "BINDING.PRY"
+        binding.pry
+        main_menu
     end
   end
 
@@ -190,13 +197,6 @@ class SpacelyftCLI
 
   def new_mission
     play_song("goliath.mp3")
-    # PICK ITEMS FROM INVENTORY TO SEND ABOUT
-    # PICK DESTINATION
-    # PICK ROCKETSHIP TO USE
-    # PICK PILOT
-    # REVIEW MISSION DETAILS
-    # LAUNCH MISSION!
-
 
     system("clear")
 
@@ -205,13 +205,13 @@ class SpacelyftCLI
     puts "      ....:::: SPACELYFT - NEW MISSION ::::...."
     puts "======================================================"
     puts ""
-    puts "CURRENT ACCOUNT: #{username.username}"
-    puts "ACCOUNT ID: #{username.id} // TERMINAL ID: #{username}"
+    puts "CURRENT ACCOUNT: #{user.user_name}"
+    puts "ACCOUNT ID: #{user.id} // TERMINAL ID: #{user}"
     puts ""
     puts "======================================================"
     puts ""
 
-    user_id = username.id
+###################### TESTING #######################################
 
     prompt = TTY::Prompt.new
     mission_name = prompt.ask("What is the Mission Name?") do |q|
@@ -220,28 +220,35 @@ class SpacelyftCLI
       end
 
     prompt = TTY::Prompt.new
-    item = prompt.ask("What item are you sending out?") do |q|
-        q.required true
-        q.modify   :up
-      end
+    selected_choices = prompt.collect do
+      key(:item).select("Choose Item(s)", Item.pluck("item_name"))
 
-    prompt = TTY::Prompt.new
-    destination = prompt.ask("Where do you want us to ship it?") do |q|
-        q.required true
-        q.modify   :up
-      end
+      key(:destination).select("Choose a Destination", Destination.pluck("destination_name"))
 
-    prompt = TTY::Prompt.new
-    rocketship = prompt.ask("Which Rocketship would you like to use?") do |q|
-        q.required true
-        q.modify   :up
-      end
+      key(:rocketship).select("Choose a Rocketship", Rocketship.pluck("rocketship_name"))
 
-    prompt = TTY::Prompt.new
-    pilot = prompt.ask("Who would you like to pilot this Mission?") do |q|
-        q.required true
-        q.modify   :up
-      end
+      key(:pilot).select("Choose a Pilot", Pilot.pluck("pilot_name"))
+    end
+
+
+# selected_choices[:name, :destination, :rocketship, :pilot]
+# NOW YOU HAVE A HASH OF ALL YOUR SELECTED INSTANCES *STRINGS* ..
+# NOW FIND EACH OF THEIR INSTANCES USING SELECT.. and SAVE EACH INTO their
+# OWN VARIABLE
+
+item_instance = Item.all.find_by( item_name: selected_choices[:item] )
+destination_instance = Destination.all.find_by( destination_name: selected_choices[:destination] )
+rocketship_instance = Rocketship.all.find_by( rocketship_name: selected_choices[:rocketship] )
+pilot_instance = Pilot.all.find_by( pilot_name: selected_choices[:pilot] )
+
+# binding.pry # TEST FOR ITEM_INSTANCE!! => WORKS!
+
+######################################################################
+
+    #
+    user_id = user.id
+    #
+
 
     system("clear")
 
@@ -250,90 +257,210 @@ class SpacelyftCLI
     puts " ....:::: SPACELYFT - REVIEW MISSION DETAILS ::::...."
     puts "======================================================"
     puts ""
-    puts "CURRENT ACCOUNT: #{username.username}"
-    puts "ACCOUNT ID: #{username.id} // TERMINAL ID: #{username}"
+    puts "CURRENT ACCOUNT: #{user.user_name}"
+    puts "ACCOUNT ID: #{user.id} // TERMINAL ID: #{user}"
     puts ""
     puts "======================================================"
     puts ""
     puts "// MISSION NAME: #{mission_name}"
-    puts "// ACCOUNT ID: #{user_id}"
-    puts "// TERMINAL ID: #{username}"
-    puts "// ITEM TO SHIP: #{item}"
-    puts "// DESTINATION: #{destination}"
-    puts "// ROCKETSHIP: #{rocketship}"
-    puts "// PILOT: #{pilot}"
+    puts "// ACCOUNT ID: #{user.id}"
+    puts "// TERMINAL ID: #{user}"
+    puts "// ITEM TO SHIP: #{selected_choices[:item]}"
+    puts "// DESTINATION: #{selected_choices[:destination]}"
+    puts "// ROCKETSHIP: #{selected_choices[:rocketship]}"
+    puts "// PILOT: #{selected_choices[:pilot]}"
     puts ""
+
+# binding.pry
 
     prompt = TTY::Prompt.new
     choice = prompt.select("Is the information above correct?", ["Yes", "No", "Back To Main Menu"])
 
     case choice
       when "Yes"
-        # CREATE STUFF FIRST THEN CREATE MISSION
-        created_item = Item.create
-        created_item
-        created_item.item_name = item
-        item_id = created_item.id
-        created_item.save
-
-        created_destination = Destination.create
-        created_destination
-        created_destination.destination_name = destination
-        destination_id = created_destination.id
-        created_destination.save
-
-        created_rocketship = Rocketship.create
-        created_rocketship
-        created_rocketship.rocket_name = rocketship
-        rocketship_id = created_rocketship.id
-        created_rocketship.save
-
-        created_pilot = Pilot.create
-        created_pilot
-        created_pilot.pilot_name = pilot
-        pilot_id = created_pilot.id
-        created_pilot.save
-
-###########################
-
-        mission = Mission.create
-        mission.mission_name = mission_name
-        mission.user_id = user_id
-        mission.item_id = item_id
-        binding.pry
-        mission.destination_id = created_destination.id ############ <==== FIX THIS
-              binding.pry
-        mission.rocketship_id = created_rocketship.id
-              binding.pry
-        mission.pilot_id = created_pilot.id
-              binding.pry
-        mission.save
+        # binding.pry # BINDING TEST - LOOK AT SELECTED_CHOICES VARIABLE
+        new_mission = Mission.create
+        new_mission.mission_name = mission_name
+        new_mission.status = "IN-PROGRESS"
+        new_mission.user_id = user.id
+        new_mission.destination_id = destination_instance.id
+        new_mission.rocketship_id = rocketship_instance.id
+        new_mission.pilot_id = pilot_instance.id
+        new_mission.enemy_id = Enemy.all.sample.id  # nil # CAN I NIL THIS?
+        new_mission.save
+        # binding.pry # BINDING TEST - check NEW_MISSION VARIABLE and MISSION.ALL
+        @@new_mission << new_mission
+        battle_sequence
       when "No"
         new_mission
       when "Back To Main Menu"
-        spacelyft_app
+        main_menu
     end
 
-    puts "SUCCESSFULLY CREATED MISSION! USE BINDING.PRY TO LOOK FOR IT!"
-
-    binding.pry
-
     sleep(3.seconds)
+    main_menu ## MIGHT MAKE A LAUNCHING SCREEN TO GO TO INSTEAD..
+    # mission_flight_launch ### TESTING MISSION FLIGHT SEQUENCE
+    # battle <= GO TO BATTLE / FLIGHT SEQUENCE
   end
 
   def past_missions
     # VIEW PREVIOUSLY LAUNCHED MISSION INSTANCES
-  end
+    # mission_pluck = user.missions.pluck("mission_name")
+    # item_pluck = user.items.pluck("item_name")
+    # destination_pluck = user.destinations.pluck("destination_name")
+    # rocket_pluck = user.rocketships.pluck("rocketship_name")
+    # pilot_pluck = user.pilots.pluck("pilot_name")
+    #
+    # puts table(mission_pluck, item_pluck, destination_pluck, rocket_pluck, pilot_pluck)
 
-  def shipped_items
-    # DISPLAY ALL USERS ITEMS SHIPPED FROM PREVIOUS MISSIONS
-    # ADD/REMOVE ITEMS
 
     prompt = TTY::Prompt.new
-    choice = prompt.select("Choose a File", username.items.pluck("item_name"), per_page: 7)
+    selection = prompt.select("", ["Delete A Mission Log", "Main Menu"])
 
+    case selection
+      when "Delete A Mission Log"
+        galactic_news
+      when "Main Menu"
+        main_menu
+    end
 
   end
+
+
+  ####################################################################################
+  ############### M I S S I O N  F L I G H T  S E Q U E N C E ########################
+  ####################################################################################
+
+  def battle_sequence
+      system("clear")
+
+      stop_songs
+      sleep(1.seconds)
+      play_song("jumpshot.mp3")
+
+      rockets_ascii
+      puts "======================================================"
+      puts "      ....:::: READY TO LAUNCH ROCKET ::::...."
+      puts "======================================================"
+      puts ""
+      puts "CURRENT ACCOUNT: #{user.user_name}"
+      puts "ACCOUNT ID: #{user.id} // TERMINAL ID: #{user}"
+      puts "ROCKET HEALTH: #{@@new_mission.last.rocketship.health}"
+
+      prepare_for_launch_array = [
+        "LAUNCHING ROCKET IN 3.. 2... 1...!"
+      ]
+      puts "------------------------------------------------------"
+      puts "SPACELYFT RADIO: #{prepare_for_launch_array.sample}".colorize(:color => :white, :background => :orange)
+      puts "------------------------------------------------------"
+
+      prompt = TTY::Prompt.new
+      selection = prompt.select("", ["PRESS TO LAUNCH!"])
+
+      system("clear")
+
+      rockets_ascii
+      puts "======================================================"
+      puts "      ....:::: ROCKET LAUNCHED ::::...."
+      puts "======================================================"
+      puts ""
+      puts "CURRENT ACCOUNT: #{user.user_name}"
+      puts "ACCOUNT ID: #{user.id} // TERMINAL ID: #{user}"
+      puts "ROCKET HEALTH: #{@@new_mission.last.rocketship.health}"
+
+      rocket_launched_array = [
+        "GODSPEED, #{@@new_mission.last.rocketship.rocketship_name}!"
+      ]
+      puts "------------------------------------------------------"
+      puts "SPACELYFT RADIO: #{rocket_launched_array.sample}".colorize(:color => :white, :background => :orange)
+      puts "------------------------------------------------------"
+
+      prompt = TTY::Prompt.new
+      selection = prompt.select("", ["FULL SPEED AHEAD!"])
+
+      system("clear")
+
+      rockets_ascii # PUT ENEMY ASCII HERE
+      puts "======================================================"
+      puts "      ....:::: YOU'VE BEEN ATTACKED! ::::...."
+      puts "======================================================"
+      puts ""
+      puts "CURRENT ACCOUNT: #{user.user_name}"
+      puts "ACCOUNT ID: #{user.id} // TERMINAL ID: #{user}"
+      puts "ROCKET HEALTH: #{@@new_mission.last.rocketship.health}"
+
+      attacked_array = [
+        "HOSTILE ENEMY DETECTED!!"
+      ]
+      puts "------------------------------------------------------"
+      puts "SPACELYFT RADIO: #{attacked_array.sample}".colorize(:color => :white, :background => :orange)
+      puts "------------------------------------------------------"
+
+# enemy_instance = Enemy.all.find_by( enemy_id: @@new_mission.last.enemy_id)
+#
+# binding.pry # check enemy instance variable
+
+      prompt = TTY::Prompt.new
+      selection = prompt.select("", ["USE LASER TURRETS", "USE MISSILES"])
+
+      case selection
+        when "USE LASER TURRETS"
+          # @@new_mission.last.rocketship.attack(@@new_mission.last.enemy)
+          sleep(1.seconds)
+          puts "YOU FIRED YOUR MARK IV LASER TURRETS AT THE ENEMY!"
+          sleep(4.seconds)
+          puts "ENEMY IS WEAKENING! LET 'EM HAVE IT!"
+          sleep(4.seconds)
+          puts "YOU DESTROYED THE ENEMY!"
+          sleep(2.seconds)
+          puts "MISSION COMPLETE!"
+          sleep(5.seconds)
+          stop_songs
+          sleep(1.seconds)
+          main_menu
+        when "USE MISSILES"
+          # @@new_mission.last.rocketship.attack(@@new_mission.last.enemy)
+          sleep(1.seconds)
+          puts "YOU LAUNCHED YOUR T-10 MISSILES AT THE ENEMY!"
+          sleep(4.seconds)
+          puts "ENEMY IS WEAKENING! FIRE ALL MISSILES!"
+          sleep(4.seconds)
+          puts "YOU DESTROYED THE ENEMY!"
+          sleep(2.seconds)
+          puts "MISSION COMPLETE!"
+          sleep(5.seconds)
+          stop_songs
+          sleep(1.seconds)
+          main_menu
+        end
+
+          # if @@new_mission.last.enemy.dead?
+          #   puts "You defeated the enemy!"
+          # else
+          #   puts "You survived!"
+          # end
+          #
+          # if hero.dead?
+          #   puts "You died!"
+          # else
+          #   puts "You survived!"
+          # end
+
+    end
+
+    def galactic_news
+      # SHOWS FLAVOR TEXT ABOUT RECENT ACE PILOT DEATH AND OTHER NEWS!
+    end
+
+    def spacelyft_database
+      puts "HERE'S THE DB"
+      sleep(5.seconds)
+      main_menu
+    end
+
+
+
+
 
 
 end

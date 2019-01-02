@@ -10,35 +10,61 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181230004042) do
+ActiveRecord::Schema.define(version: 20190102172106) do
+
+  create_table "battles", force: :cascade do |t|
+    t.string  "battle_name"
+    t.integer "rocketship_id"
+    t.integer "enemy_id"
+    t.integer "mission_id"
+  end
 
   create_table "destinations", force: :cascade do |t|
     t.string "destination_name"
   end
 
+  create_table "enemies", force: :cascade do |t|
+    t.string  "enemy_name"
+    t.integer "health"
+    t.string  "status"
+  end
+
+  create_table "enemys", force: :cascade do |t|
+    t.string  "enemy_name"
+    t.integer "health"
+    t.string  "status"
+  end
+
   create_table "items", force: :cascade do |t|
-    t.string "item_name"
+    t.string  "item_name"
+    t.integer "user_id"
+    t.integer "mission_id"
+    t.string  "status"
   end
 
   create_table "missions", force: :cascade do |t|
     t.string  "mission_name"
+    t.string  "status"
     t.integer "user_id"
-    t.integer "item_id"
     t.integer "destination_id"
     t.integer "rocketship_id"
     t.integer "pilot_id"
+    t.integer "enemy_id"
   end
 
   create_table "pilots", force: :cascade do |t|
     t.string "pilot_name"
+    t.string "status"
   end
 
   create_table "rocketships", force: :cascade do |t|
-    t.string "rocket_name"
+    t.string  "rocketship_name"
+    t.integer "health"
+    t.string  "status"
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "username"
+    t.string "user_name"
   end
 
 end
