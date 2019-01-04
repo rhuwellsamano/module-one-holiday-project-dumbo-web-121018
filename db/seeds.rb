@@ -42,3 +42,7 @@ enemy2 = Enemy.create(enemy_name: "PREDATOR", health: 100, status: "ACTIVE")
 enemy3 = Enemy.create(enemy_name: "TERRAN", health: 100, status: "ACTIVE")
 enemy4 = Enemy.create(enemy_name: "ZERG", health: 100, status: "ACTIVE")
 enemy5 = Enemy.create(enemy_name: "PROTOSS", health: 100, status: "ACTIVE")
+
+mission1 = Mission.create(mission_name: "TEST MISSION", status: "TESTING", user_id: User.first.id, destination_id: Destination.first.id, rocketship_id: Rocketship.first.id, pilot_id: Pilot.first.id, enemy_id: Enemy.first.id)
+
+@@new_mission << mission1

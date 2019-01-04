@@ -2,9 +2,17 @@
 require 'terminal-table/import'
 
 class SpacelyftCLI
-  attr_accessor :user, :rocketship_instance
+  attr_accessor :user, :rocketship_instance, :mission
 
-  @@new_mission = []
+
+  def user_missions
+  Mission.all.select do |mission|
+    mission.user_id == user.id
+    end
+  end
+
+  @@new_mission = [Mission.all]
+
 
   def spacelyft_app
 
@@ -77,7 +85,7 @@ class SpacelyftCLI
     # pid = fork{ exec "killall", 'afplay' }
 
     sleep(1.seconds)
-    puts "Please hold while we locate your account!"
+    puts "Please hold while we create your account!"
     sleep(2.seconds)
     play_song("comefindme.mp3")
     # pid = fork{ exec 'afplay', "comefindme.mp3" }
@@ -92,14 +100,14 @@ class SpacelyftCLI
     self.user = User.find_by(user_name: choice)
     sleep(0.seconds)
     puts "Welcome back, #{self.user.user_name}!"
-    sleep(0.seconds)
+    sleep(1.seconds)
     puts "Hold on while we pull up your account!"
     puts "..."
-    sleep(0.seconds)
+    sleep(1.seconds)
     puts "....."
-    sleep(0.seconds)
+    sleep(1.seconds)
     puts "......."
-    sleep(0.seconds)
+    sleep(1.seconds)
     puts "DONE!"
     stop_songs
     sleep(1.seconds)
@@ -114,7 +122,14 @@ class SpacelyftCLI
     puts "            ..:: ABOUT SPACELYFT! ::.."
     puts "======================================================"
     puts ""
-    puts "Here's some text about Spacelyft!"
+    puts "SPACELYFT IS THE FUTURE!"
+    puts ""
+    puts "SpaceLyft was founded by the famous Stringed Cheese & Co. Founders."
+    puts "SpaceLyft delivers goods from Space-Age Greenhouse Farms to markets"
+    puts "all around the Galaxy!"
+    puts ""
+    puts "The SpaceLyft CLI App is made for you to coordinate New Missions"
+    puts "and to help spread life throughout the Final Great Frontier!"
     puts ""
     puts ""
 
@@ -139,10 +154,14 @@ class SpacelyftCLI
     puts "======================================================"
     sleep(5.seconds)
     system("clear")
+    sleep(1.seconds)
+    system "exit"
   end
 
 
   def main_menu
+
+    # user_missions
 
     stop_songs
     sleep(1.seconds)
@@ -171,7 +190,7 @@ class SpacelyftCLI
     puts "------------------------------------------------------"
 
     prompt = TTY::Prompt.new
-    selection = prompt.select("", ["GNN - GALACTIC NEWS NETWORK", "New Mission", "Past Mission Logs", "SPACELYFT.DB", "Go Back", "BINDING.PRY"])
+    selection = prompt.select("", ["GNN - GALACTIC NEWS NETWORK", "New Mission", "Past Mission Logs", "Go Back"])
 
     case selection
       when "GNN - GALACTIC NEWS NETWORK"
@@ -180,19 +199,58 @@ class SpacelyftCLI
         new_mission
       when "Past Mission Logs"
         past_missions
-      when "SPACELYFT.DB"
-        spacelyft_database
+      # when "SPACELYFT.DB"
+      #   spacelyft_database
       when "Go Back"
         stop_songs
         spacelyft_app
-      when "BINDING.PRY"
-        binding.pry
-        main_menu
+      # when "BINDING.PRY"
+      #   binding.pry
+      #   main_menu
     end
   end
 
   def galactic_news
-    # SHOWS FLAVOR TEXT ABOUT RECENT ACE PILOT DEATH AND OTHER NEWS!
+    system("clear")
+
+    system("clear")
+
+    rockets_ascii
+    puts "======================================================"
+    puts "    ....:::: GNN - GALACTIC NEWS NETWORK ::::...."
+    puts "======================================================"
+    puts ""
+    puts "CURRENT ACCOUNT: #{user.user_name}"
+    puts "ACCOUNT ID: #{user.id} // TERMINAL ID: #{user}"
+
+    random_weather_array = [
+      "GEOSOLAR STORMS IN THE VICINITY!",
+      "MAGNETIC ANNOMALYS IN THE AREA!",
+      "A HORDE OF SPACE PIRATES HAVE BEEN SPOTTED!",
+      "GIANT ASTEROIDS HEADING THIS WAY! BRACE FOR LASER REMOVAL!",
+      "ALIEN LIFEFORMS ARE TAKING OVER A NEARBY PLANET!"
+    ]
+    puts "------------------------------------------------------"
+    puts "GNN NEWSFLASH: #{random_weather_array.sample}".colorize(:color => :white)
+    puts "SPACELYFT NET WORTH: $#{rand(50000000..1000000000)}"
+    puts "------------------------------------------------------"
+
+    puts "Ace Spacelyft Pilot Prounounced Dead!"
+    puts ""
+    puts "In the recent Alien attacks, Ace Spacelyft Pilot Mitchell 'Flyboy' Cruz"
+    puts "fought valiantly but was unfortunately met with defeat. He leaves behind no known"
+    puts "family but has been known to have owned a Dog for as long as he was working as"
+    puts "a Spacelyft Pilot. To infinite and beyond, Mitchell! Thank you for your service!"
+    sleep(5.seconds)
+
+    prompt = TTY::Prompt.new
+    selection = prompt.select("", ["Main Menu"])
+
+    case selection
+      when "Main Menu"
+        main_menu
+    end
+
   end
 
   def new_mission
@@ -281,15 +339,16 @@ pilot_instance = Pilot.all.find_by( pilot_name: selected_choices[:pilot] )
         # binding.pry # BINDING TEST - LOOK AT SELECTED_CHOICES VARIABLE
         new_mission = Mission.create
         new_mission.mission_name = mission_name
-        new_mission.status = "IN-PROGRESS"
+        new_mission.status = "SUCCESSFUL"
         new_mission.user_id = user.id
         new_mission.destination_id = destination_instance.id
         new_mission.rocketship_id = rocketship_instance.id
         new_mission.pilot_id = pilot_instance.id
         new_mission.enemy_id = Enemy.all.sample.id  # nil # CAN I NIL THIS?
         new_mission.save
+        # @@missions << new_mission
         # binding.pry # BINDING TEST - check NEW_MISSION VARIABLE and MISSION.ALL
-        @@new_mission = new_mission #<< new_mission
+        @@new_mission << new_mission #<< new_mission
         battle_sequence
       when "No"
         new_mission
@@ -313,13 +372,15 @@ pilot_instance = Pilot.all.find_by( pilot_name: selected_choices[:pilot] )
     #
     # puts table(mission_pluck, item_pluck, destination_pluck, rocket_pluck, pilot_pluck)
 
+    puts "SPACELYFT IS RUNNING DATABASE MAINTENANCE BETWEEN THE HOURS OF"
+    puts "12PM TO 6PM GALACTIC SPACE TIME (GST). "
 
     prompt = TTY::Prompt.new
-    selection = prompt.select("", ["Delete A Mission Log", "Main Menu"])
+    selection = prompt.select("", ["Delete A Mission Log (DISABLED FOR MAINTENANCE)", "Main Menu"])
 
     case selection
-      when "Delete A Mission Log"
-        galactic_news
+    when "Delete A Mission Log (DISABLED FOR MAINTENANCE)"
+        main_menu
       when "Main Menu"
         main_menu
     end
@@ -399,7 +460,7 @@ puts "          /'               ` | | | | | '               `\   "
 puts "                             ` | | | '   "
 puts "                               ` | '   "
 puts ""
-    end
+      end
 
       enemy1 # PUT ENEMY ASCII HERE
       # rockets_ascii
@@ -409,10 +470,13 @@ puts ""
       puts ""
       puts "CURRENT ACCOUNT: #{user.user_name}"
       puts "ACCOUNT ID: #{user.id} // TERMINAL ID: #{user}"
-      puts "ROCKET HEALTH: #{@@new_mission.last.rocketship.health}"
+      puts "ROCKET HEALTH: #{@@new_mission.last.rocketship.health - rand(20..80)}"
+      # .colorize(:color => :red)
 
       attacked_array = [
-        "HOSTILE ENEMY DETECTED!!"
+        "HOSTILE ENEMY DETECTED!!",
+        "UNKNOWN LIFEFORMS ATTACKING",
+        "MAN YOUR STATIONS!! ENEMY SPOTTED!!"
       ]
       puts "------------------------------------------------------"
       puts "SPACELYFT RADIO: #{attacked_array.sample}".colorize(:color => :white, :background => :orange)
@@ -440,6 +504,8 @@ puts ""
           sleep(2.seconds)
           puts "MISSION COMPLETE!"
           sleep(5.seconds)
+          puts ""
+          puts "🎉 🎉 🎉 🎉 🎉 🎉 🎉 🎉"
           # stop_songs
           sleep(1.seconds)
           main_menu
@@ -454,6 +520,8 @@ puts ""
           sleep(2.seconds)
           puts "MISSION COMPLETE!"
           sleep(5.seconds)
+          puts ""
+          puts "🎉 🎉 🎉 🎉 🎉 🎉 🎉 🎉"
           # stop_songs
           sleep(1.seconds)
           main_menu
@@ -471,21 +539,21 @@ puts ""
           #   puts "You survived!"
           # end
 
-    end
+  end
 
-    def galactic_news
-      # SHOWS FLAVOR TEXT ABOUT RECENT ACE PILOT DEATH AND OTHER NEWS!
-    end
-
-    def spacelyft_database
-      puts "HERE'S THE DB"
-      binding.pry
-      puts table(User.missions.mission_names)
-      binding.pry
-      sleep(5.seconds)
-      main_menu
-    end
-
+#     def spacelyft_database
+#       puts "HERE'S THE DB"
+# binding.pry
+#       user_missions
+#       binding.pry
+#
+# binding.pry
+#       puts table(User.missions.mission_names)
+#       binding.pry
+#       sleep(5.seconds)
+#       main_menu
+#     end
+#
 
 
 
